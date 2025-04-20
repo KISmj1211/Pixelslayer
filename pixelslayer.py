@@ -1,26 +1,26 @@
 import pygame
 import random
 
-# 초기 설정
+# basic settings
 pygame.init()
 
 WIDTH, HEIGHT = 500, 500
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pixel Slayer")
 
-# 색상
+# color tools
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 ATTACK_COLOR = (255, 100, 100)
 
-# FPS 설정
+# FPS settings
 clock = pygame.time.Clock()
 FPS = 60
 FONT = pygame.font.Font(None, 36)
 
-# 플레이어 클래스
+# class for the player
 class Player:
     def __init__(self):
         self.rect = pygame.Rect(WIDTH // 2, HEIGHT // 2, 40, 40)
@@ -40,7 +40,7 @@ class Player:
     def attack(self, enemies):
         if not self.attacking:
             self.attacking = True
-            self.attack_timer = 12 # 0.2s
+            self.attack_timer = 12 # = 0.2s
             enemies[:] = [enemy for enemy in enemies if not self.attack_range.colliderect(enemy.rect)]
             
             """
@@ -66,15 +66,15 @@ class Player:
         if not self.invincible:
             self.lives -= 1
             self.invincible = True
-            self.invincible_timer = 60 # 1초동안 무적
+            self.invincible_timer = 60 # 1 second invinciblity
     
     def update(self):
-        # 무적이면 -> 무적 타이머 -1 -> 무적 타이머 0보다 작아지면 무적=False
+        # if invincible -> infivincible timer-1 -> if invincible timer = 0 Invincibility=False
         if self.invincible:
             self.invincible_timer -= 1
             if self.invincible_timer <= 0:
                 self.invincible = False
-        # 공격 상태이면 -> 공격 타이머 -1 -> 공격 타이머 0보다 작거나 같으면 = False
+        # attacking -> attacking timer -1 -> attacking timer <= 0  attacking timer= False
         if self.attacking: 
             self.attack_timer -= 1
             if self.attack_timer <= 0:
@@ -120,7 +120,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
         
-        # player 이동
+        # player movement
         keys = pygame.key.get_pressed()
         dx, dy = 0,0 
         if keys[pygame.K_LEFT]:
@@ -135,15 +135,15 @@ def main():
         player.move(dx, dy)
         
         
-        # 공격 처리
+        # enemies attacked
         if keys[pygame.K_SPACE]:
             player.attack(enemies)        
         
-        # 적 이동
+        # enemies movement
         for enemy in enemies:
             enemy.move_towards(player)
 
-        # 충돌 처리
+        # colliding system
         for enemy in enemies[:]:
             if player.rect.colliderect(enemy.rect):
                 player.take_damage()
@@ -151,15 +151,15 @@ def main():
                 
         player.update()
 
-        # 게임 오버 체크
+        # checking game over
         if player.lives <= 0:
             print("Game Over!")
             pygame.time.delay(2000)
             run = False
 
-        # 스테이지 업그레이드
+        # stage upgrading
         if not enemies:
-            if stage >= 5:  # 모든 스테이지 완료 시 종료
+            if stage >= 5:  # if all stages end = win
                 print("You Win!")
                 pygame.time.delay(2000)
                 run = False
@@ -168,12 +168,12 @@ def main():
                 enemies = spawn_enemies(stage * 3)
                 print(f"Stage {stage}!")
 
-        # 렌더링
+        # randering
         player.draw()
         for enemy in enemies:
             enemy.draw()
 
-        # 스테이지 표시
+        # stage showing
         stage_text = FONT.render(f"Stage {stage}", True, BLACK)
         SCREEN.blit(stage_text, (WIDTH // 2 - 50, 10))
         
